@@ -9,12 +9,17 @@ import google.generativeai as genai
 
 # --------------------------- App Config ---------------------------
 APP_TITLE = "AI To-Do"
+st.set_page_config(page_title=APP_TITLE, page_icon="📝", layout="wide")
+
 DATA_FILE = "tasks.json"
 
-# Gemini API Setup
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+
+# Sidebar for API key input
+st.sidebar.header("🔑 API Key")
+user_api_key = st.sidebar.text_input("Enter your Gemini API Key:", type="password")
+
+if user_api_key:
+    genai.configure(api_key=user_api_key)
     GEMINI_AVAILABLE = True
 else:
     GEMINI_AVAILABLE = False
@@ -59,11 +64,12 @@ def new_task_dict(title: str, due: Optional[date], priority: str, tags: List[str
 
 
 # --------------------------- AI Helpers ---------------------------
+
 def ai_parse_task(prompt: str) -> Dict[str, Any]:
     """Parse a natural language prompt into a task dict fields."""
     if not GEMINI_AVAILABLE:
         return {"title": prompt.strip(), "priority": "Medium", "due": None, "tags": []}
-
+        
     try:
         model = genai.GenerativeModel("gemini-1.5-flash")
         resp = model.generate_content(
@@ -97,7 +103,7 @@ def ai_parse_task(prompt: str) -> Dict[str, Any]:
 def ai_breakdown(title: str) -> List[str]:
     """Break a task into 3–6 actionable subtasks."""
     if not GEMINI_AVAILABLE:
-        return []
+        st.sidebar.warning("⚠️ Gemini API key not set. AI features disabled.")
 
     try:
         model = genai.GenerativeModel("gemini-1.5-flash")
@@ -145,7 +151,6 @@ def ai_prioritize(tasks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
 
 # --------------------------- UI ---------------------------
-st.set_page_config(page_title=APP_TITLE, page_icon="📝", layout="wide")
 st.title("📝 AI To-Do")
 st.caption("Add tasks normally or let AI extract details, break down work, and help prioritize.")
 
