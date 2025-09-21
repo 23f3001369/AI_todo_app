@@ -12,7 +12,7 @@ A simple To-Do list app with optional AI features powered by Gemini:
 ```bash
 pip install -r requirements.txt
 # Set your key (PowerShell):
-$env:GEMINI_API_KEY="sk-..."
+$env:GEMINI_API_KEY="...."
 # macOS/Linux:
-export GEMINI_API_KEY="sk-..."
+export GEMINI_API_KEY="...."
 streamlit run app.py
